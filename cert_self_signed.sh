@@ -126,6 +126,21 @@ gen_sign_cert()
     echo 
 }
 
+## is a certificate
+is_cert(){
+    openssl x509 -noout -modulus -in $1 >/dev/null 2>&1
+    if [[ `echo $?` -ne 0 ]];then
+        echo;echo -e "\033[31mERROR: $1 is not a certificate! \033[0m";echo;exit;
+    fi 
+}
+
+## is a private key
+is_pri_key(){
+    openssl rsa -noout -modulus -in $1 >/dev/null 2>&1
+    if [[ `echo $?` -ne 0 ]];then
+        echo;echo -e "\033[31mERROR: $1 is not a private key! \033[0m";echo;exit;
+    fi 
+}
 
 ####
 dir_create(){
@@ -143,8 +158,8 @@ while [ -n "$1" ]; do
 {
     case $1 in
         -c) cfg_file=$2;is_empty $1 $cfg_file;is_file $cfg_file cfg;shift;;
-        -ca) rootca_cert=$2;is_empty $1 $rootca_cert;is_file $rootca_cert rootca_cert;shift;;
-        -key) rootca_key=$2;is_empty $1 $rootca_key;is_file $rootca_key rootca_key;shift;;
+        -ca) rootca_cert=$2;is_empty $1 $rootca_cert;is_file $rootca_cert rootca_cert;is_cert $rootca_cert;shift;;
+        -key) rootca_key=$2;is_empty $1 $rootca_key;is_file $rootca_key rootca_key;is_pri_key $rootca_key;shift;;
         -h) usage;;
         *) echo -e "\033[31mInvalid arg: $1 \033[0m";echo;usage;;
     esac

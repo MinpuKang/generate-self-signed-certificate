@@ -36,44 +36,54 @@ For Example:
 # Paramters in Config File
 1. For Root CA：
   Two parameters are defined: CN_ROOTCA is a FQDN for Root CA, Subject_PreCN_ROOT is the Subject for Common Name including, and format is below:
+  
     CN_ROOTCA: <Value>
+ 
     Subject_PreCN_ROOT: <Value>
+ 
   for example: 
+ 
     CN_ROOTCA: www.hk314.top
+ 
     Subject_PreCN_ROOT: C=CN/ST=LN/L=DL/O=HK/OU=Root
 
 2. For Client Certificate:
   Two parameters are defined: CN_Cert is a FQDN for Root CA, Subject_PreCN_Cert is the Subject for Common Name including, and format is below:
+  
     CN_Cert: <Value>
+    
     Subject_PreCN_Cert: <Value>
+    
   for example: 
+  
     CN_Cert: self.cert.hk314.top
+    
     Subject_PreCN_Cert: C=CN/ST=LN/L=DL/O=HK/OU=Self
 
 # An example for generate Root CA and sign certificate:
 [coreuser@HK:ca_self_signed]$ ./cert_self_signed.sh -c config.cfg
 [INFO] Generating CA key files 
 Generating RSA private key, 4096 bit long modulus (2 primes)
-....................................................................................................................................................................++++
-..................................................................................................................................................................++++
+.................................................................................++++
+.....................................................................................++++
 e is 65537 (0x010001)
 
 [INFO] Generating Root CA 
 Can't load /home/coreuser/.rnd into RNG
-140651893559744:error:2406F079:random number generator:RAND_load_file:Cannot open file:../crypto/rand/randfile.c:88:Filename=/home/coreuser/.rnd
+140085377307072:error:2406F079:random number generator:RAND_load_file:Cannot open file:../crypto/rand/randfile.c:88:Filename=/home/coreuser/.rnd
 
 [INFO] Generating ROOT CA in PEM 
 Done
 
 [INFO] Generating key files 
 Generating RSA private key, 4096 bit long modulus (2 primes)
-......................++++
-...............++++
+..................................................................................................................................................................................................................................++++
+..............................................................................................................................................................................................................................................++++
 e is 65537 (0x010001)
 
 [INFO] Generating CSR 
 Can't load /home/coreuser/.rnd into RNG
-140347426673088:error:2406F079:random number generator:RAND_load_file:Cannot open file:../crypto/rand/randfile.c:88:Filename=/home/coreuser/.rnd
+139861134938560:error:2406F079:random number generator:RAND_load_file:Cannot open file:../crypto/rand/randfile.c:88:Filename=/home/coreuser/.rnd
 
 [INFO] Generating self signed certs 
 Signature ok
@@ -85,7 +95,7 @@ Done
 
 
 [RESULT] Certificates are generated and in below folder: 
-Certificates in folder: /mnt/c/Users/eminpka/Desktop/ca_self_signed/dir_cert_20210924210254
+Certificates in folder: /home/coreuser/ca_self_signed/dir_cert_20210924210744
 ca.crt
 ca.key
 ca.pem
@@ -95,26 +105,26 @@ self.cert.hk314.top.key
 self.cert.hk314.top.pem
 
 [Verify] Verify and Check Certificate: 
-/mnt/c/Users/eminpka/Desktop/ca_self_signed/dir_cert_20210924210254/self.cert.hk314.top.pem: OK
+/home/coreuser/ca_self_signed/dir_cert_20210924210744/self.cert.hk314.top.pem: OK
 
 [INFO] More CLIs to check certificate: 
-openssl verify -verbose -CAfile dir_cert_20210924210254/ca.crt /mnt/c/Users/eminpka/Desktop/ca_self_signed/dir_cert_20210924210254/self.cert.hk314.top.pem
-openssl x509 -noout -text -in dir_cert_20210924210254/ca.crt
-openssl req -text -noout -in /mnt/c/Users/eminpka/Desktop/ca_self_signed/dir_cert_20210924210254/self.cert.hk314.top.csr
-openssl x509 -noout -text -in /mnt/c/Users/eminpka/Desktop/ca_self_signed/dir_cert_20210924210254/self.cert.hk314.top.crt
-openssl x509 -noout -text -in /mnt/c/Users/eminpka/Desktop/ca_self_signed/dir_cert_20210924210254/self.cert.hk314.top.pem
+openssl verify -verbose -CAfile dir_cert_20210924210744/ca.crt /home/coreuser/ca_self_signed/dir_cert_20210924210744/self.cert.hk314.top.pem
+openssl x509 -noout -text -in dir_cert_20210924210744/ca.crt
+openssl req -text -noout -in /home/coreuser/ca_self_signed/dir_cert_20210924210744/self.cert.hk314.top.csr
+openssl x509 -noout -text -in /home/coreuser/ca_self_signed/dir_cert_20210924210744/self.cert.hk314.top.crt
+openssl x509 -noout -text -in /home/coreuser/ca_self_signed/dir_cert_20210924210744/self.cert.hk314.top.pem
 
-# An example to sign certificate with exising CA:
-[coreuser@HK:ca_self_signed]$ ./cert_self_signed.sh -c config.cfg1 -ca dir_cert_20210924210254/ca.crt -key dir_cert_20210924210254/ca.key 
+# An example to sign certificate with exising CA
+[coreuser@HK:ca_self_signed]$ ./cert_self_signed.sh -c config.cfg1 -ca dir_cert_20210924210744/ca.crt -key dir_cert_20210924210744/ca.key
 [INFO] Generating key files 
 Generating RSA private key, 4096 bit long modulus (2 primes)
-................................................................................................................................................................++++
-........................................................................++++
+............................................................................++++
+................................................................................................................................................................................................................................................................................................................................++++
 e is 65537 (0x010001)
 
 [INFO] Generating CSR 
 Can't load /home/coreuser/.rnd into RNG
-139696556020160:error:2406F079:random number generator:RAND_load_file:Cannot open file:../crypto/rand/randfile.c:88:Filename=/home/coreuser/.rnd
+140683471557056:error:2406F079:random number generator:RAND_load_file:Cannot open file:../crypto/rand/randfile.c:88:Filename=/home/coreuser/.rnd
 
 [INFO] Generating self signed certs 
 Signature ok
@@ -128,7 +138,7 @@ Done
 Done
 
 [RESULT] Certificates are generated and in below folder: 
-Certificates in folder: /mnt/c/Users/eminpka/Desktop/ca_self_signed/dir_cert_20210924210442
+Certificates in folder: /home/coreuser/ca_self_signed/dir_cert_20210924210811
 ca.crt
 ca.key
 self1.cert.hk314.top.crt
@@ -137,12 +147,17 @@ self1.cert.hk314.top.key
 self1.cert.hk314.top.pem
 
 [Verify] Verify and Check Certificate: 
-/mnt/c/Users/eminpka/Desktop/ca_self_signed/dir_cert_20210924210442/self1.cert.hk314.top.pem: OK
+/home/coreuser/ca_self_signed/dir_cert_20210924210811/self1.cert.hk314.top.pem: OK
 
 [INFO] More CLIs to check certificate: 
-openssl verify -verbose -CAfile dir_cert_20210924210254/ca.crt /mnt/c/Users/eminpka/Desktop/ca_self_signed/dir_cert_20210924210442/self1.cert.hk314.top.pem
-openssl x509 -noout -text -in dir_cert_20210924210254/ca.crt
-openssl req -text -noout -in /mnt/c/Users/eminpka/Desktop/ca_self_signed/dir_cert_20210924210442/self1.cert.hk314.top.csr
-openssl x509 -noout -text -in /mnt/c/Users/eminpka/Desktop/ca_self_signed/dir_cert_20210924210442/self1.cert.hk314.top.crt
-openssl x509 -noout -text -in /mnt/c/Users/eminpka/Desktop/ca_self_signed/dir_cert_20210924210442/self1.cert.hk314.top.pem
+openssl verify -verbose -CAfile dir_cert_20210924210744/ca.crt /home/coreuser/ca_self_signed/dir_cert_20210924210811/self1.cert.hk314.top.pem
+openssl x509 -noout -text -in dir_cert_20210924210744/ca.crt
+openssl req -text -noout -in /home/coreuser/ca_self_signed/dir_cert_20210924210811/self1.cert.hk314.top.csr
+openssl x509 -noout -text -in /home/coreuser/ca_self_signed/dir_cert_20210924210811/self1.cert.hk314.top.crt
+openssl x509 -noout -text -in /home/coreuser/ca_self_signed/dir_cert_20210924210811/self1.cert.hk314.top.pem
+
+
+
+
+
 

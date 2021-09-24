@@ -29,7 +29,9 @@ Options:
            Note: -ca and -key must be set in pair.
 
 For Example:
-\-------------------------
+
+\---------------------------------------------------------------------------------
+
  1. Show Help:
     
     user@host > cert_self_signed.sh -h
@@ -46,7 +48,7 @@ For Example:
     
     user@host > cert_self_signed.sh -c config.cfg -ca /home/user/ca.crt -key ca.key
  
----------------------------------------------------------------------------------
+\---------------------------------------------------------------------------------
 
 # Paramters in Config File
 1. For Root CA：

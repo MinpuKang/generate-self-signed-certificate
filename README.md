@@ -6,6 +6,7 @@ It can generate a CA and then sign certificates to client.
 It can also sign certificates to client based on existing CA with CA CRT and CA Private Key.
 
 # Usage
+```
 [coreuser@HK:ca_self_signed]$ ./cert_self_signed.sh -h
 
 This is used to generate certificate with an existed CA or self-signed certificates based on openssl!
@@ -49,7 +50,7 @@ For Example:
     user@host > cert_self_signed.sh -c config.cfg -ca /home/user/ca.crt -key ca.key
  
 \---------------------------------------------------------------------------------
-
+```
 # Paramters in Config File
 1. For Root CA：
 

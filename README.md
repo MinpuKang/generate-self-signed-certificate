@@ -29,7 +29,7 @@ Options:
            Note: -ca and -key must be set in pair.
 
 For Example:
----------------------------------------------------------------------------------
+\-------------------------
  1. Show Help:
     
     user@host > cert_self_signed.sh -h

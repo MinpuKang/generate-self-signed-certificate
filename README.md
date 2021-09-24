@@ -80,7 +80,7 @@ For Example:
     Subject_PreCN_Cert: C=CN/ST=LN/L=DL/O=HK/OU=Self
 
 # An example for generate Root CA and sign certificate:
- [coreuser@HK:ca_self_signed]$ ./cert_self_signed.sh -c config.cfg
+   [coreuser@HK:ca_self_signed]$ ./cert_self_signed.sh -c config.cfg
 
  [INFO] Generating CA key files 
 

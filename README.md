@@ -80,143 +80,143 @@ For Example:
     Subject_PreCN_Cert: C=CN/ST=LN/L=DL/O=HK/OU=Self
 
 # An example for generate Root CA and sign certificate:
-[coreuser@HK:ca_self_signed]$ ./cert_self_signed.sh -c config.cfg
+ [coreuser@HK:ca_self_signed]$ ./cert_self_signed.sh -c config.cfg
 
-[INFO] Generating CA key files 
+ [INFO] Generating CA key files 
 
-Generating RSA private key, 4096 bit long modulus (2 primes)
-.................................................................................++++
-.....................................................................................++++
-e is 65537 (0x010001)
+ Generating RSA private key, 4096 bit long modulus (2 primes)
+ .................................................................................++++
+ .....................................................................................++++
+ e is 65537 (0x010001)
 
-[INFO] Generating Root CA 
+ [INFO] Generating Root CA 
 
-Can't load /home/coreuser/.rnd into RNG
-140085377307072:error:2406F079:random number generator:RAND_load_file:Cannot open file:../crypto/rand/randfile.c:88:Filename=/home/coreuser/.rnd
+ Can't load /home/coreuser/.rnd into RNG
+ 140085377307072:error:2406F079:random number generator:RAND_load_file:Cannot open file:../crypto/rand/randfile.c:88:Filename=/home/coreuser/.rnd
 
-[INFO] Generating ROOT CA in PEM 
+ [INFO] Generating ROOT CA in PEM 
 
-Done
+ Done
 
-[INFO] Generating key files 
+ [INFO] Generating key files 
 
-Generating RSA private key, 4096 bit long modulus (2 primes)
-..................................................................................................................................................................................................................................++++
-..............................................................................................................................................................................................................................................++++
-e is 65537 (0x010001)
+ Generating RSA private key, 4096 bit long modulus (2 primes)
+ ..................................................................................................................................................................................................................................++++
+ ..............................................................................................................................................................................................................................................++++
+ e is 65537 (0x010001)
 
-[INFO] Generating CSR 
+ [INFO] Generating CSR 
 
-Can't load /home/coreuser/.rnd into RNG
-139861134938560:error:2406F079:random number generator:RAND_load_file:Cannot open file:../crypto/rand/randfile.c:88:Filename=/home/coreuser/.rnd
+ Can't load /home/coreuser/.rnd into RNG
+ 139861134938560:error:2406F079:random number generator:RAND_load_file:Cannot open file:../crypto/rand/randfile.c:88:Filename=/home/coreuser/.rnd
 
-[INFO] Generating self signed certs 
+ [INFO] Generating self signed certs 
 
-Signature ok
+ Signature ok
 
-subject=C = CN, ST = LN, L = DL, O = HK, OU = Self, CN = self.cert.hk314.top
+ subject=C = CN, ST = LN, L = DL, O = HK, OU = Self, CN = self.cert.hk314.top
 
-Getting CA Private Key
+ Getting CA Private Key
 
-[INFO] Generating PEM of client certificate 
+ [INFO] Generating PEM of client certificate 
 
-Done
+ Done
 
 
-[RESULT] Certificates are generated and in below folder: 
+ [RESULT] Certificates are generated and in below folder: 
 
-Certificates in folder: /home/coreuser/ca_self_signed/dir_cert_20210924210744
+ Certificates in folder: /home/coreuser/ca_self_signed/dir_cert_20210924210744
 
-ca.crt
+ ca.crt
 
-ca.key
+ ca.key
 
-ca.pem
+ ca.pem
 
-self.cert.hk314.top.crt
+ self.cert.hk314.top.crt
 
-self.cert.hk314.top.csr
+ self.cert.hk314.top.csr
 
-self.cert.hk314.top.key
+ self.cert.hk314.top.key
 
-self.cert.hk314.top.pem
+ self.cert.hk314.top.pem
 
-[Verify] Verify and Check Certificate: 
+ [Verify] Verify and Check Certificate: 
 
-/home/coreuser/ca_self_signed/dir_cert_20210924210744/self.cert.hk314.top.pem: OK
+ /home/coreuser/ca_self_signed/dir_cert_20210924210744/self.cert.hk314.top.pem: OK
 
-[INFO] More CLIs to check certificate: 
+ [INFO] More CLIs to check certificate: 
 
-openssl verify -verbose -CAfile dir_cert_20210924210744/ca.crt /home/coreuser/ca_self_signed/dir_cert_20210924210744/self.cert.hk314.top.pem
+ openssl verify -verbose -CAfile dir_cert_20210924210744/ca.crt /home/coreuser/ca_self_signed/dir_cert_20210924210744/self.cert.hk314.top.pem
 
-openssl x509 -noout -text -in dir_cert_20210924210744/ca.crt
+ openssl x509 -noout -text -in dir_cert_20210924210744/ca.crt
 
-openssl req -text -noout -in /home/coreuser/ca_self_signed/dir_cert_20210924210744/self.cert.hk314.top.csr
+ openssl req -text -noout -in /home/coreuser/ca_self_signed/dir_cert_20210924210744/self.cert.hk314.top.csr
 
-openssl x509 -noout -text -in /home/coreuser/ca_self_signed/dir_cert_20210924210744/self.cert.hk314.top.crt
+ openssl x509 -noout -text -in /home/coreuser/ca_self_signed/dir_cert_20210924210744/self.cert.hk314.top.crt
 
-openssl x509 -noout -text -in /home/coreuser/ca_self_signed/dir_cert_20210924210744/self.cert.hk314.top.pem
+ openssl x509 -noout -text -in /home/coreuser/ca_self_signed/dir_cert_20210924210744/self.cert.hk314.top.pem
 
 # An example to sign certificate with exising CA
-[coreuser@HK:ca_self_signed]$ ./cert_self_signed.sh -c config.cfg1 -ca dir_cert_20210924210744/ca.crt -key dir_cert_20210924210744/ca.key
+ [coreuser@HK:ca_self_signed]$ ./cert_self_signed.sh -c config.cfg1 -ca dir_cert_20210924210744/ca.crt -key dir_cert_20210924210744/ca.key
 
-[INFO] Generating key files 
+ [INFO] Generating key files 
 
-Generating RSA private key, 4096 bit long modulus (2 primes)
-............................................................................++++
-................................................................................................................................................................................................................................................................................................................................++++
-e is 65537 (0x010001)
+ Generating RSA private key, 4096 bit long modulus (2 primes)
+ ............................................................................++++
+ ................................................................................................................................................................................................................................................................................................................................++++
+ e is 65537 (0x010001)
 
-[INFO] Generating CSR 
+ [INFO] Generating CSR 
 
-Can't load /home/coreuser/.rnd into RNG
-140683471557056:error:2406F079:random number generator:RAND_load_file:Cannot open file:../crypto/rand/randfile.c:88:Filename=/home/coreuser/.rnd
+ Can't load /home/coreuser/.rnd into RNG
+ 140683471557056:error:2406F079:random number generator:RAND_load_file:Cannot open file:../crypto/rand/randfile.c:88:Filename=/home/coreuser/.rnd
 
-[INFO] Generating self signed certs 
+ [INFO] Generating self signed certs 
 
-Signature ok
+ Signature ok
 
-subject=C = CN, ST = LN, L = DL, O = HK, OU = Self, CN = self1.cert.hk314.top
+ subject=C = CN, ST = LN, L = DL, O = HK, OU = Self, CN = self1.cert.hk314.top
 
-Getting CA Private Key
+ Getting CA Private Key
 
-[INFO] Generating PEM of client certificate 
+ [INFO] Generating PEM of client certificate 
 
-Done
+ Done
 
-[INFO] Copy CA certificate and key to target folder! 
+ [INFO] Copy CA certificate and key to target folder! 
 
-Done
+ Done
 
-[RESULT] Certificates are generated and in below folder: 
+ [RESULT] Certificates are generated and in below folder: 
 
-Certificates in folder: /home/coreuser/ca_self_signed/dir_cert_20210924210811
+ Certificates in folder: /home/coreuser/ca_self_signed/dir_cert_20210924210811
 
-ca.crt
+ ca.crt
 
-ca.key
+ ca.key
 
-self1.cert.hk314.top.crt
+ self1.cert.hk314.top.crt
 
-self1.cert.hk314.top.csr
+ self1.cert.hk314.top.csr
 
-self1.cert.hk314.top.key
+ self1.cert.hk314.top.key
 
-self1.cert.hk314.top.pem
+ self1.cert.hk314.top.pem
 
-[Verify] Verify and Check Certificate: 
+ [Verify] Verify and Check Certificate: 
 
-/home/coreuser/ca_self_signed/dir_cert_20210924210811/self1.cert.hk314.top.pem: OK
+ /home/coreuser/ca_self_signed/dir_cert_20210924210811/self1.cert.hk314.top.pem: OK
 
-[INFO] More CLIs to check certificate: 
+ [INFO] More CLIs to check certificate: 
 
-openssl verify -verbose -CAfile dir_cert_20210924210744/ca.crt /home/coreuser/ca_self_signed/dir_cert_20210924210811/self1.cert.hk314.top.pem
+ openssl verify -verbose -CAfile dir_cert_20210924210744/ca.crt /home/coreuser/ca_self_signed/dir_cert_20210924210811/self1.cert.hk314.top.pem
 
-openssl x509 -noout -text -in dir_cert_20210924210744/ca.crt
+ openssl x509 -noout -text -in dir_cert_20210924210744/ca.crt
 
-openssl req -text -noout -in /home/coreuser/ca_self_signed/dir_cert_20210924210811/self1.cert.hk314.top.csr
+ openssl req -text -noout -in /home/coreuser/ca_self_signed/dir_cert_20210924210811/self1.cert.hk314.top.csr
 
-openssl x509 -noout -text -in /home/coreuser/ca_self_signed/dir_cert_20210924210811/self1.cert.hk314.top.crt
+ openssl x509 -noout -text -in /home/coreuser/ca_self_signed/dir_cert_20210924210811/self1.cert.hk314.top.crt
 
-openssl x509 -noout -text -in /home/coreuser/ca_self_signed/dir_cert_20210924210811/self1.cert.hk314.top.pem
+ openssl x509 -noout -text -in /home/coreuser/ca_self_signed/dir_cert_20210924210811/self1.cert.hk314.top.pem
 

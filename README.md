@@ -166,3 +166,5 @@ openssl x509 -noout -text -in /home/coreuser/ca_self_signed/dir_cert_20210924210
 
 ```
 
+Additional, here is an introduction of [What is a Digital Signature translated](https://www.ruanyifeng.com/blog/2011/08/what_is_a_digital_signature.html) from [An introduction to Digital Signatures, by David Youd](http://www.youdzone.com/signature.html).
+

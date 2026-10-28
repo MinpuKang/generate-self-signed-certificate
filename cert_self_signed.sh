@@ -4,6 +4,7 @@
 # Github: https://github.com/MinpuKang/generate-self-signed-certificate
 # Version: 
 #       1.0, 2021-09-24
+#       2.0, 2026-10-28, add keyUsage and extendedKeyUsage
 
 
 ########################################
@@ -96,7 +97,7 @@ gen_rootca_cert()
     echo 
     
     echo -e "\033[34m[INFO] Generating Root CA \033[0m"
-    openssl req -new -x509 -days 36500 -key ${rootca_key} -out ${rootca_cert} -set_serial `echo $RANDOM` -subj "/${Subject_PreCN_ROOT}/CN=${CN_ROOTCA}"
+    openssl req -new -x509 -days 36500 -key ${rootca_key} -out ${rootca_cert} -set_serial `echo $RANDOM` -subj "/${Subject_PreCN_ROOT}/CN=${CN_ROOTCA}" -addext "keyUsage = critical, digitalSignature, keyEncipherment, keyCertSign" -addext "extendedKeyUsage = serverAuth, clientAuth"
     echo
 
     echo -e "\033[34m[INFO] Generating ROOT CA in PEM \033[0m"
@@ -113,11 +114,11 @@ gen_sign_cert()
     echo 
     
     echo -e "\033[34m[INFO] Generating CSR \033[0m"
-    openssl req -new -key ${dir_cert_name}/${self_cert_name}.key -out ${dir_cert_name}/${self_cert_name}.csr -subj "/${Subject_PreCN_Cert}/CN=${CN_Cert}" 
+    openssl req -new -key ${dir_cert_name}/${self_cert_name}.key -out ${dir_cert_name}/${self_cert_name}.csr -subj "/${Subject_PreCN_Cert}/CN=${CN_Cert}" -addext "keyUsage = critical, digitalSignature, keyEncipherment" -addext "extendedKeyUsage = serverAuth, clientAuth"
     echo 
     
     echo -e "\033[34m[INFO] Generating self signed certs \033[0m"
-    openssl x509 -req -days 36500 -in ${dir_cert_name}/${self_cert_name}.csr -CA ${rootca_cert} -CAkey ${rootca_key} -set_serial `echo $RANDOM` -extfile <(printf "subjectAltName=DNS:${CN_Cert}") -out ${dir_cert_name}/${self_cert_name}.crt
+    openssl x509 -req -days 36500 -in ${dir_cert_name}/${self_cert_name}.csr -CA ${rootca_cert} -CAkey ${rootca_key} -set_serial `echo $RANDOM` -extfile <(printf "subjectAltName=DNS:${CN_Cert}") -out ${dir_cert_name}/${self_cert_name}.crt -copy_extensions copy
     echo 
     
     echo -e "\033[34m[INFO] Generating PEM of client certificate \033[0m"

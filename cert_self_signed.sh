@@ -23,7 +23,7 @@ usage()
 {
 cat <<EOF 
 This is used to generate certificate with an existed CA or self-signed certificates based on openssl!
-Version: 1.0
+Version: 2.1
 
 Usage:
  ${script_name} [-h] -c ConfigFile [-ca CACert -key CAKey] [-root]

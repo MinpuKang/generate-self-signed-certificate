@@ -7,13 +7,15 @@
 #       2.0, 2026-10-28, add keyUsage and extendedKeyUsage
 #       2.1, 2026-11-09, update Alternative Name with multiple FQDNs or IPs in CSR and then in certificates
 #                        add new paramter "-root" to generate root CA only
+#       2.2, 2026-11-13, add cRLSign in root CA, remove critical in keyUsage, and add new paramter -d to specical the out directory name.
 
 ########################################
-#   No edits below this line
+#   Predfined parameters
 ########################################
 
 script_name=`basename $0`
-dir_cert_name="dir_cert_"`date +%Y%m%d%H%M%S`
+timestamp=`date +%Y%m%d%H%M%S`
+dir_cert_name="dir_cert_"${timestamp}
 rootca_cert=""
 rootca_key=""
 self_cert_name=""
@@ -23,10 +25,10 @@ usage()
 {
 cat <<EOF 
 This is used to generate certificate with an existed CA or self-signed certificates based on openssl!
-Version: 2.1
+Version: 2.2
 
 Usage:
- ${script_name} [-h] -c ConfigFile [-ca CACert -key CAKey] [-root]
+ ${script_name} [-h] -c ConfigFile [-ca CACert -key CAKey] [-root] [-d DirctoryName]
 
 Options:
  -h        Show the help
@@ -35,9 +37,10 @@ Options:
  -ca       An existed CA certificate(with relative path or absolute path)
  -key      The existed CA private key file(with relative path or absolute path)
            Note: -ca and -key must be set in pair.
+ -d        Output of Diretory where certificates located, if not set, a predefined folder with timestamp is used
 
 For Example:
----------------------------------------------------------------------------------
+-----------------------------------------------------------------------------------------------------
  1. Show Help:
     user@host > ${script_name} -h
  
@@ -51,8 +54,15 @@ For Example:
     user@host > ${script_name} -c config.cfg -ca ca.crt -key ca.key
     OR
     user@host > ${script_name} -c config.cfg -ca /home/user/ca.crt -key ca.key
- 
----------------------------------------------------------------------------------
+
+ 5. Generate certificate in a fixed directory:
+    user@host > ${script_name} -c config.cfg -d test
+    OR
+    user@host > ${script_name} -c config.cfg -ca ca.crt -key ca.key -d client_cert_folder
+    OR
+    user@host > ${script_name} -c config.cfg -ca /home/user/ca.crt -key ca.key -d client_cert_folder
+
+-----------------------------------------------------------------------------------------------------
 
 EOF
 
@@ -79,18 +89,49 @@ is_file()
 is_empty()
 {
     if [ -z $2 ];then
-        if [ $1 == "-c" ];then
-            echo;echo -e "\033[31mERROR: missing the value for \"-c\"! \033[0m";echo;usage;exit;
-        elif [ $1 == "-ca" ];then
-            echo;echo -e "\033[31mERROR: missing the value for \"-ca\"! \033[0m";echo;usage;exit;
-        elif [ $1 == "-key" ];then
-            echo;echo -e "\033[31mERROR: missing the value for \"-key\"! \033[0m";echo;usage;exit;
+        if [[ "$1" == "-c" ]] || [[ "$1" == "-ca" ]] || [[ "$1" == "-key" ]] || [[ "$1" == "-d" ]];then
+            echo;echo -e "\033[31mERROR: missing the value for \"${1}\"! \033[0m";echo;usage;exit;
         else 
             echo;echo -e "\033[31mERROR: missing mandatory parameters! \033[0m";echo;usage;exit;
         fi 
     fi
 }
 
+#directory existing or not, if yes, backup to folder
+dir_exisiting()
+{
+    local dir_name="$1"
+
+    # 1. Check if the parameter is provided
+    if [ -z "$dir_name" ]; then
+        echo "Error: Directory name parameter is missing.";echo
+        return 1
+    fi
+
+    # Remove trailing slash if present (e.g., "test_dir/" -> "test_dir")
+    dir_name="${dir_name%/}"
+
+    # 2. Check if the directory exists
+    if [ -d "$dir_name" ]; then
+        echo "Notice: Directory '$dir_name' exists. Starting backup..."
+
+        # Generate timestamp (Format: YYYYMMDD_HHMMSS, e.g., 20261113_124100)
+        local backup_name="${dir_name}_${timestamp}"
+
+        # 3. Perform backup (Use 'cp -r' to copy, or 'mv' if you want to rename/move it)
+        mv "$dir_name" "$backup_name"
+
+        if [ $? -eq 0 ]; then
+            echo "Backup successful!"
+            echo "Backup in folder: "`pwd`"/${backup_name}"". And file in the backup:" 
+            ls -l ${backup_name} | awk 'NR>=2 {print $9}' 
+            echo
+        else
+            echo "Error: Failed to backup directory '$dir_name'.";echo
+            return 1
+        fi
+    fi
+}
 
 ### Generate Root CA
 gen_rootca_cert()
@@ -100,7 +141,8 @@ gen_rootca_cert()
     echo 
     
     echo -e "\033[34m[INFO] Generating Root CA \033[0m"
-    openssl req -new -x509 -days 36500 -key ${rootca_key} -out ${rootca_cert} -set_serial `echo $RANDOM` -subj "/${Subject_PreCN_ROOT}/CN=${CN_ROOTCA}" -addext "keyUsage = critical, digitalSignature, keyEncipherment, keyCertSign" -addext "extendedKeyUsage = serverAuth, clientAuth"
+    openssl req -new -x509 -days 36500 -key ${rootca_key} -out ${rootca_cert} -set_serial `echo $RANDOM` -subj "/${Subject_PreCN_ROOT}/CN=${CN_ROOTCA}" -addext "keyUsage = digitalSignature, keyEncipherment, keyCertSign, cRLSign" 
+    #-addext "extendedKeyUsage = serverAuth, clientAuth"
     echo
 
     echo -e "\033[34m[INFO] Generating ROOT CA in PEM \033[0m"
@@ -117,7 +159,7 @@ gen_sign_cert()
     echo 
     
     echo -e "\033[34m[INFO] Generating CSR \033[0m"
-    openssl req -new -key ${dir_cert_name}/${self_cert_name}.key -out ${dir_cert_name}/${self_cert_name}.csr -subj "/${Subject_PreCN_Cert}/CN=${CN_Cert}" -addext "keyUsage = critical, digitalSignature, keyEncipherment" -addext "extendedKeyUsage = serverAuth, clientAuth" -addext "subjectAltName = ${Alt_names}"
+    openssl req -new -key ${dir_cert_name}/${self_cert_name}.key -out ${dir_cert_name}/${self_cert_name}.csr -subj "/${Subject_PreCN_Cert}/CN=${CN_Cert}" -addext "keyUsage = digitalSignature, keyEncipherment" -addext "extendedKeyUsage = serverAuth, clientAuth" -addext "subjectAltName = ${Alt_names}" #-addext "basicConstraints=CA:FALSE"
     echo 
     
     echo -e "\033[34m[INFO] Generating self signed certs \033[0m"
@@ -211,6 +253,7 @@ while [ -n "$1" ]; do
         -ca) rootca_cert=$2;is_empty $1 $rootca_cert;is_file $rootca_cert rootca_cert;is_cert $rootca_cert;shift;;
         -key) rootca_key=$2;is_empty $1 $rootca_key;is_file $rootca_key rootca_key;is_pri_key $rootca_key;shift;;
         -root) rootca="only";shift;;
+        -d) dir_cert_name=$2;is_empty $1 $dir_cert_name;dir_exisiting $dir_cert_name;shift;;
         -h) usage;;
         *) echo -e "\033[31mInvalid arg: $1 \033[0m";echo;usage;;
     esac
@@ -229,7 +272,6 @@ Alt_names=$(gen_alt_names "$(cat ${cfg_file} | grep -E "^CN_Cert" | awk -F ":" '
 
 self_cert_name=${CN_Cert}
 
-
 if [[ -f $cfg_file ]] && [[ $rootca == "only" ]] ;then 
     if [[ $CN_ROOTCA == "" ]] || [[ $Subject_PreCN_ROOT == "" ]];then 
         echo -e "\033[31mERROR: Subject for ROOT CA is not fully set, please check the config file! \033[0m"
@@ -241,6 +283,11 @@ if [[ -f $cfg_file ]] && [[ $rootca == "only" ]] ;then
     dir_create ${dir_cert_name}
     gen_rootca_cert
     mv ${dir_cert_name} rootCA_${dir_cert_name#dir_cert_}
+    dir_cert_name="rootCA_"${dir_cert_name#dir_cert_}
+    
+    echo -e "\033[34m[RESULT] Root CA is generated and in below folder: \033[0m"
+    echo "Certificates in folder: "`pwd`"/${dir_cert_name}"
+    ls -l ${dir_cert_name} | awk 'NR>=2 {print $9}' 
 ### generate certificates with existing CA
 elif [[ -f $cfg_file ]] && [[ $rootca_cert != "" ]] && [[ $rootca_key != "" ]];then 
     if [[ `diff -eq <(openssl x509 -noout -modulus -in $rootca_cert | openssl md5) <(openssl rsa -noout -modulus -in $rootca_key | openssl md5)` == "" ]];then

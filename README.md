@@ -10,10 +10,10 @@ It can also sign certificates to client based on existing CA with CA CRT and CA 
 
 [test@wsl:generate-self-signed-certificate-main]$ ./cert_self_signed.sh -h
 This is used to generate certificate with an existed CA or self-signed certificates based on openssl!
-Version: 2.1
+Version: 2.2
 
 Usage:
- cert_self_signed.sh [-h] -c ConfigFile [-ca CACert -key CAKey] [-root]
+ cert_self_signed.sh [-h] -c ConfigFile [-ca CACert -key CAKey] [-root] [-d DirctoryName]
 
 Options:
  -h        Show the help
@@ -22,9 +22,10 @@ Options:
  -ca       An existed CA certificate(with relative path or absolute path)
  -key      The existed CA private key file(with relative path or absolute path)
            Note: -ca and -key must be set in pair.
+ -d        Output of Diretory where certificates located, if not set, a predefined folder with timestamp is used
 
 For Example:
----------------------------------------------------------------------------------
+-----------------------------------------------------------------------------------------------------
  1. Show Help:
     user@host > cert_self_signed.sh -h
  
@@ -38,8 +39,15 @@ For Example:
     user@host > cert_self_signed.sh -c config.cfg -ca ca.crt -key ca.key
     OR
     user@host > cert_self_signed.sh -c config.cfg -ca /home/user/ca.crt -key ca.key
- 
----------------------------------------------------------------------------------
+
+ 5. Generate certificate in a fixed directory:
+    user@host > cert_self_signed.sh -c config.cfg -d test
+    OR
+    user@host > cert_self_signed.sh -c config.cfg -ca ca.crt -key ca.key -d client_cert_folder
+    OR
+    user@host > cert_self_signed.sh -c config.cfg -ca /home/user/ca.crt -key ca.key -d client_cert_folder
+
+-----------------------------------------------------------------------------------------------------
 ```
 # Paramters in Config File
 1. For Root CA：

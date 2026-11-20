@@ -8,6 +8,7 @@
 #       2.1, 2026-11-09, update Alternative Name with multiple FQDNs or IPs in CSR and then in certificates
 #                        add new paramter "-root" to generate root CA only
 #       2.2, 2026-11-13, add cRLSign in root CA, remove critical in keyUsage, and add new paramter -d to specical the out directory name.
+#       2.3， 2026-11-20, add p12 convert from crt
 
 ########################################
 #   Predfined parameters
@@ -25,10 +26,10 @@ usage()
 {
 cat <<EOF 
 This is used to generate certificate with an existed CA or self-signed certificates based on openssl!
-Version: 2.2
+Version: 2.3
 
 Usage:
- ${script_name} [-h] -c ConfigFile [-ca CACert -key CAKey] [-root] [-d DirctoryName]
+ ${script_name} [-h] -c ConfigFile [-ca CACert -key CAKey] [-root] [-d DirctoryName] [-p12p Password OR NULL(for no password)]
 
 Options:
  -h        Show the help
@@ -38,6 +39,7 @@ Options:
  -key      The existed CA private key file(with relative path or absolute path)
            Note: -ca and -key must be set in pair.
  -d        Output of Diretory where certificates located, if not set, a predefined folder with timestamp is used
+ -p12p     P12 password, if no need password, set NULL
 
 For Example:
 -----------------------------------------------------------------------------------------------------
@@ -50,10 +52,10 @@ For Example:
  3. Generate a ROOT CA and self-signed certificate:
     user@host > ${script_name} -c config.cfg
 
- 4. Generate certificate with an existd ROOT CA:
-    user@host > ${script_name} -c config.cfg -ca ca.crt -key ca.key
+ 4. Generate certificate with an existd ROOT CA, and also convert to p12 formart:
+    user@host > ${script_name} -c config.cfg -ca ca.crt -key ca.key -p12p test 
     OR
-    user@host > ${script_name} -c config.cfg -ca /home/user/ca.crt -key ca.key
+    user@host > ${script_name} -c config.cfg -ca /home/user/ca.crt -key ca.key -p12p test 
 
  5. Generate certificate in a fixed directory:
     user@host > ${script_name} -c config.cfg -d test
@@ -141,12 +143,12 @@ gen_rootca_cert()
     echo 
     
     echo -e "\033[34m[INFO] Generating Root CA \033[0m"
-    openssl req -new -x509 -days 36500 -key ${rootca_key} -out ${rootca_cert} -set_serial `echo $RANDOM` -subj "/${Subject_PreCN_ROOT}/CN=${CN_ROOTCA}" -addext "keyUsage = digitalSignature, keyEncipherment, keyCertSign, cRLSign" 
+    openssl req -new -x509 -days 36500 -key ${rootca_key} -out ${rootca_cert} -set_serial `echo $RANDOM` -subj "/${Subject_PreCN_ROOT}/CN=${CN_ROOTCA}" -addext "keyUsage = critical, digitalSignature, keyEncipherment, keyCertSign, cRLSign" 
     #-addext "extendedKeyUsage = serverAuth, clientAuth"
     echo
 
-    echo -e "\033[34m[INFO] Generating ROOT CA in PEM \033[0m"
-    cat `pwd`"/${rootca_cert}" `pwd`"/${rootca_key}" >  `pwd`"/${dir_cert_name}/ca.pem"
+    #echo -e "\033[34m[INFO] Generating ROOT CA in PEM \033[0m"
+    #cat `pwd`"/${rootca_cert}" `pwd`"/${rootca_key}" >  `pwd`"/${dir_cert_name}/ca.pem"
     echo "Done"
     echo 
 }
@@ -159,7 +161,7 @@ gen_sign_cert()
     echo 
     
     echo -e "\033[34m[INFO] Generating CSR \033[0m"
-    openssl req -new -key ${dir_cert_name}/${self_cert_name}.key -out ${dir_cert_name}/${self_cert_name}.csr -subj "/${Subject_PreCN_Cert}/CN=${CN_Cert}" -addext "keyUsage = digitalSignature, keyEncipherment" -addext "extendedKeyUsage = serverAuth, clientAuth" -addext "subjectAltName = ${Alt_names}" #-addext "basicConstraints=CA:FALSE"
+    openssl req -new -key ${dir_cert_name}/${self_cert_name}.key -out ${dir_cert_name}/${self_cert_name}.csr -subj "/${Subject_PreCN_Cert}/CN=${CN_Cert}" -addext "keyUsage =  critical, digitalSignature, keyEncipherment" -addext "extendedKeyUsage = serverAuth, clientAuth" -addext "subjectAltName = ${Alt_names}" #-addext "basicConstraints=CA:FALSE"
     echo 
     
     echo -e "\033[34m[INFO] Generating self signed certs \033[0m"
@@ -167,8 +169,18 @@ gen_sign_cert()
     openssl x509 -req -days 36500 -in ${dir_cert_name}/${self_cert_name}.csr -CA ${rootca_cert} -CAkey ${rootca_key} -set_serial `echo $RANDOM` -out ${dir_cert_name}/${self_cert_name}.crt -copy_extensions copy
     echo 
     
-    echo -e "\033[34m[INFO] Generating PEM of client certificate \033[0m"
-    cat `pwd`"/${dir_cert_name}/${self_cert_name}.crt" `pwd`"/${dir_cert_name}/${self_cert_name}.key" > `pwd`"/${dir_cert_name}/${self_cert_name}.pem"
+    if [[ $p12pw != "" ]] && [[ $p12pw == "NULL" ]] ;then
+        echo -e "\033[34m[INFO] Generating P12 formart of client certificate without password \033[0m"
+        openssl pkcs12 -export -inkey ${dir_cert_name}/${self_cert_name}.key -in ${dir_cert_name}/${self_cert_name}.crt -out ${dir_cert_name}/${self_cert_name}.p12 -passout pass:
+        { base64 -w 0 ${dir_cert_name}/${self_cert_name}.p12 && echo; } > ${dir_cert_name}/${self_cert_name}.p12.base64.txt
+    elif [[ $p12pw != "" ]]; then
+        echo -e "\033[34m[INFO] Generating P12 formart of client certificate with password ${p12pw} \033[0m"
+        openssl pkcs12 -export -inkey ${dir_cert_name}/${self_cert_name}.key -in ${dir_cert_name}/${self_cert_name}.crt -out ${dir_cert_name}/${self_cert_name}.p12 -passout pass:${p12pw}
+        { base64 -w 0 ${dir_cert_name}/${self_cert_name}.p12 && echo; } > ${dir_cert_name}/${self_cert_name}.p12.base64.txt
+    fi 
+    
+    #echo -e "\033[34m[INFO] Generating PEM of client certificate \033[0m"
+    #cat `pwd`"/${dir_cert_name}/${self_cert_name}.crt" `pwd`"/${dir_cert_name}/${self_cert_name}.key" > `pwd`"/${dir_cert_name}/${self_cert_name}.pem"
     echo "Done"
     echo 
 }
@@ -254,6 +266,7 @@ while [ -n "$1" ]; do
         -key) rootca_key=$2;is_empty $1 $rootca_key;is_file $rootca_key rootca_key;is_pri_key $rootca_key;shift;;
         -root) rootca="only";shift;;
         -d) dir_cert_name=$2;is_empty $1 $dir_cert_name;dir_exisiting $dir_cert_name;shift;;
+        -p12p) p12pw=$2;is_empty $1 $p12pw;shift;;
         -h) usage;;
         *) echo -e "\033[31mInvalid arg: $1 \033[0m";echo;usage;;
     esac
@@ -342,6 +355,10 @@ if [[ $rootca != "only" ]];then
     echo "openssl req -text -noout -in `pwd`/${dir_cert_name}/${self_cert_name}.csr"
     echo "openssl x509 -noout -text -in `pwd`/${dir_cert_name}/${self_cert_name}.crt"
     echo "openssl x509 -noout -text -in `pwd`/${dir_cert_name}/${self_cert_name}.pem"
+    if [[ $p12pw != "" ]] && [[ $p12pw == "NULL" ]] ;then
+        echo "openssl pkcs12 -info -in `pwd`/${dir_cert_name}/${self_cert_name}.p12 -noout -passin pass:"
+    elif [[ $p12pw != "" ]]; then
+        echo "openssl pkcs12 -info -in `pwd`/${dir_cert_name}/${self_cert_name}.p12 -noout -passin pass:${p12pw}"
+    fi 
     echo 
 fi 
-

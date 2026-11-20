@@ -10,10 +10,10 @@ It can also sign certificates to client based on existing CA with CA CRT and CA 
 
 [test@wsl:generate-self-signed-certificate-main]$ ./cert_self_signed.sh -h
 This is used to generate certificate with an existed CA or self-signed certificates based on openssl!
-Version: 2.2
+Version: 2.3
 
 Usage:
- cert_self_signed.sh [-h] -c ConfigFile [-ca CACert -key CAKey] [-root] [-d DirctoryName]
+ cert_self_signed.sh [-h] -c ConfigFile [-ca CACert -key CAKey] [-root] [-d DirctoryName] [-p12p Password OR NULL(for no password)]
 
 Options:
  -h        Show the help
@@ -23,6 +23,7 @@ Options:
  -key      The existed CA private key file(with relative path or absolute path)
            Note: -ca and -key must be set in pair.
  -d        Output of Diretory where certificates located, if not set, a predefined folder with timestamp is used
+ -p12p     P12 password, if no need password, set NULL
 
 For Example:
 -----------------------------------------------------------------------------------------------------
@@ -35,10 +36,10 @@ For Example:
  3. Generate a ROOT CA and self-signed certificate:
     user@host > cert_self_signed.sh -c config.cfg
 
- 4. Generate certificate with an existd ROOT CA:
-    user@host > cert_self_signed.sh -c config.cfg -ca ca.crt -key ca.key
+ 4. Generate certificate with an existd ROOT CA, and also convert to p12 formart:
+    user@host > cert_self_signed.sh -c config.cfg -ca ca.crt -key ca.key -p12p test 
     OR
-    user@host > cert_self_signed.sh -c config.cfg -ca /home/user/ca.crt -key ca.key
+    user@host > cert_self_signed.sh -c config.cfg -ca /home/user/ca.crt -key ca.key -p12p test 
 
  5. Generate certificate in a fixed directory:
     user@host > cert_self_signed.sh -c config.cfg -d test
